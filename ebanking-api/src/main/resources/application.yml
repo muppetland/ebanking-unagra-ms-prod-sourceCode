@@ -1,0 +1,143 @@
+#port application
+server:
+  port: 6665
+  #${random.int(7000,7100)}
+
+#application name
+spring:
+  application:
+    name: ebanking-api
+
+  #setup git eureka config from application.yml...
+  config:
+    #import: optional:configserver:http://localhost:6661
+    import: ${SPRING_CONFIG_SERVER:optional:configserver:http://localhost:6661}
+
+  #database #1 connection parameters...
+db1:
+  datasource:
+    url: ENC(ylXv9DBRAJspDdfU7VhxJ0YjuBtCUwbr8jt0X/kE/q+mjTA7Uxu3qwwjKycUStIXxC+4fs3f7SsZbB5WwpdTSBxEQAwnuMjA/uL8cNOvY8l0jG0tQhxgFpXE5GxAL2Wf5Yz28+cE4fi6eSfVojgWb+/IpwjO7m0z8rkECbPQrwJm9yvR4G9HR/0EggTupapN)
+    username: ENC(mAxFuI16bBzqozVT5vtHz1+qCyWtjJJQLqgt09qmYk2Fe0uCAG8l5rCaWLfBavMu)
+    password: ENC(IDH9Ccf08NoLoP9b7hLxXIkZgYA6s6yG7/5X/jCVVLOrctJ2bF47YZh52SBDWURx2WwikVgrD1Z4TpzBjM5Lig==)
+    driver.class: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+    #hibernet properties...
+    #.ddl-auto = In production, it's often highly recommended you use "NONE", don't remove it please or you will be fire and us we're gonna hit by ceo....
+    #.ddl-auto = In development, it's often common to see developers "UPDATE"...
+  jpa:
+    hibernate:
+      dll-auto: none
+      show-sql: false
+      default_schema: dbo
+      repositories:
+        bootstrap-mode: default
+      properties:
+        hibernate:
+          format_sql: true
+          dialect: org.hibernate.dialect.SQLServer2016Dialect
+    properties:
+      hibernate:
+        type:
+          preferred_instant_jdbc_type: TIMESTAMP #is used for version spring boot 3 and jpa 6
+
+#database #2 connection parameters...
+db2:
+  datasource.url: ENC(ZROLMDlPZ10vqQ54eb72D9w6SkSRa4clQpPsHUV3lZSwYPMjA4g5Ci7J1mPEk/E2yVgtRrQH6iLNDgHBJKn6UQ1SQ0egvA3s1n0hBYuAVJfipTNnL3PKaSqConqyITRgDz4obn6yy2c0U/cUIVRwKWld0P09epa9vxj98glqgcTG0/Th3XZQsdL4S09j+QyJ)
+  datasource.username: ENC(vgaE6cGsQk27uUqXHbLEoE6GGegpyiSteERtvc75b3Jnz882/XdUzp6kv3r6a6Xg)
+  datasource.password: ENC(JhV4slrrN/T4NyTb9zA1KLZ+dQC1qjrWtXGgHmmTVJtcJyCIo5c4C0w+y5ec037E)
+  datasource.driver.class: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+#set jasypt properties to encrypt...
+jasypt:
+  encryptor.algorithm: PBEWITHHMACSHA512ANDAES_256
+  encryptor.iv-generator-classname: org.jasypt.iv.RandomIvGenerator
+  encryptor.password: "*1JFoA1OhNT*NN6O"
+
+#vector to use for Encrypt/Decrypt values in our project...
+ebanking:
+  vector: ENC(cJ2RmBMuiOoUsmff91n8fs4Lzyzj9V33hYTatwcD1RAzEf/rdirNTHRZEEhauNUUsHKjl3hwVpDwCIwJsxeZuw==)
+  password: ENC(HawLMaGNCzRtSwNFkS7mmZi16Vv68uyC0CVBWyO6mEGUMUuhGpglN24DhPFPGdIlvS3YaTGGyTO5wH87JThxXA==)
+  enviormentClass: ENC(Mfx9dIe8KQ1///M1Rljrj/1wPT+QsfVxKlUAX7yaTbzlR239tIYt5SWTig3JuuHK)
+  enviormentOPT: ENC(taY9RQ3Jryz4KRZ5G9BBTUfDr0yvmeO7WBbKzxztE0tSDIrJfhPOTk/451FcpFlB)
+  unagraID: ENC(ylvsMxPP3JLUiPSmMlGBqPGw2x/Vt2004qg1fO3ZyYSsqX4+SMOk08xUdjkqmhcg)
+  minimumAmount: 1
+  lapsedMinutsBetweenTransfer: 1
+  pageNo: "0"
+  pageSize: "20"
+  filterOption: 1
+  startDate: ""
+  endDate: ""
+
+#config circuit breaker...
+management:
+  health:
+    circuitbreakers:
+      enable: true
+    enpoints:
+      web:
+        exposure:
+          include: health
+    enpoint:
+      health:
+        show-details: always
+  endpoints:
+    web:
+      exposure:
+        include:
+          - mappings
+          - env
+          - health
+          - info
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      cbNTA:
+        registerHealthIndicator: true
+        eventConsumerBufferSize: 10
+        failureRateThreshold: 50
+        minimumNumberOfCalls: 5
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        waitDurationInOpenState: 5s
+        permittedNumberOfCallsInHalfOpenState: 3
+        slidingWindowSize: 10
+        slidingWindowType: COUNT_BASED
+
+
+
+
+
+    #server port to test app...
+    #serverport=6699
+
+    #adding this project to discovery service...
+    #eureka:
+    #instance:
+    #prefer-ip-address: true
+    #instance-id:${spring.application.name}:${spring.applicatin.instance_id:${random.value}}
+    #client:
+    #fetch-registry: true
+    #register-with-eureka: true
+    #service-url:
+  #defaultZone: http://localhost:8761/eureka
+
+#server.port=0
+#eureka.instance.instance-id=${spring.application.name}:${random.uuid}
+
+
+#setup eureka client
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+  client:
+    healthcheck:
+      enabled: true
+    registry-with-eureka: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+
+#about the app...
+info:
+  app:
+    name: ${spring.application.name}

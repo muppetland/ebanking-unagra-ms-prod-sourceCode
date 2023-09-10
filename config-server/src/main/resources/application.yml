@@ -1,0 +1,29 @@
+#setup port...
+server:
+  port: 6661
+
+#setup application nam...
+spring:
+  application:
+    name: config-server
+
+#setup git application.yml...
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://github.com/muppetland/ebanking-unagra-ms
+          clone-on-start: true
+
+#setup eureka client
+eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
+  client:
+    fetch-registry: true
+    registry-with-eureka: true
+    service-url:
+      #defaultZone: http://localhost:8761/eureka
+      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+

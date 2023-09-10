@@ -1,0 +1,22 @@
+#setup port...
+server:
+  port: 8761
+
+#eureka setup...
+eureka:
+  instance:
+    prefer-ip-address: true
+    #hostname: localhost
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    waitTimeInMsWhenSyncEmpty: 0
+
+  #logging...
+  logging:
+    level:
+      com:
+        netflix:
+          eureka: OFF
+          discovery: OFF

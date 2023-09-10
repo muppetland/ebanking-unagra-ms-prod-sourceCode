@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+  sd_ebanking:
+    build: .
+    ports:
+      - "8761:8761"
+  as_ebanking:
+    build: .
+    ports:
+      - "9991:6661"
+    links:
+      - sd_ebanking
+    environment:
+      - EUREKA_INSTANCE_PREFERIPADDRESS=true
