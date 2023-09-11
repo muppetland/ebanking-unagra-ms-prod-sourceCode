@@ -14,6 +14,7 @@ import com.unagra.ebankingapi.repository.ebanking.OtpTokenRepository;
 import com.unagra.ebankingapi.repository.ebanking.ThirdsAccountsRepository;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -178,21 +179,43 @@ public class ThirdsAccountsServiceImp implements ThirdsAccountsService {
         Pageable pageble = PageRequest.of(pageNo, pageSize, sort);
         Page<ThirdsAccounts> thirdsAccountsList = thirdsAccountsRepository.getThirdsAccountsList(customerid, 1,
                 pageble);
-        // System.out.println(thirdsAccountsList.getContent());
 
-        // create a response body...
-        ThirdsAccountsListResponse thirdsAccountsListResponse = new ThirdsAccountsListResponse()
-                .builder()
-                .pageNo(pageble.getPageNumber() + 1)
-                .pageSize(pageble.getPageSize())
-                .recordsDisplayed(thirdsAccountsList.getNumberOfElements())
-                .dateTimeResponse(dateFormat.format(date))
-                .thirdsAccountsList(thirdsAccountsList.getContent())
-                .msg("La página " + (pageble.getPageNumber() + 1) + " contiene "
-                        + thirdsAccountsList.getNumberOfElements()
-                        + " cuenta(s) de terceros " + vgSourceUNAGRA
-                        + " asociadas al clienteID " + customerid)
-                .build();
+        //if we have information...
+        ThirdsAccountsListResponse thirdsAccountsListResponse = null;
+        if (thirdsAccountsList != null) {
+            // create a response body...
+            thirdsAccountsListResponse = new ThirdsAccountsListResponse()
+                    .builder()
+                    .pageNo(pageble.getPageNumber() + 1)
+                    .pageSize(pageble.getPageSize())
+                    .recordsDisplayed(thirdsAccountsList.getNumberOfElements())
+                    .recodsTotal(thirdsAccountsList.getTotalElements())
+                    .recodsPages(thirdsAccountsList.getTotalPages())
+                    .dateTimeResponse(dateFormat.format(date))
+                    .thirdsAccountsList(thirdsAccountsList.getContent())
+                    .msg("La página " + (pageble.getPageNumber() + 1) + " contiene "
+                            + thirdsAccountsList.getNumberOfElements()
+                            + " cuenta(s) de terceros " + vgSourceUNAGRA
+                            + " asociadas al clienteID " + customerid)
+                    .build();
+        } else {
+            thirdsAccountsListResponse = new ThirdsAccountsListResponse()
+                    .builder()
+                    .pageNo(pageble.getPageNumber())
+                    .pageSize(pageble.getPageSize())
+                    .recordsDisplayed(thirdsAccountsList.getNumberOfElements())
+                    .recodsTotal(thirdsAccountsList.getTotalElements())
+                    .recodsPages(thirdsAccountsList.getTotalPages())
+                    .dateTimeResponse(dateFormat.format(date))
+                    .thirdsAccountsList(thirdsAccountsList.getContent())
+                    .msg("La página " + (pageble.getPageNumber() + 1) + " contiene "
+                            + thirdsAccountsList.getNumberOfElements()
+                            + " cuenta(s) de terceros " + vgSourceUNAGRA
+                            + " asociadas al clienteID " + customerid)
+                    .build();
+        }
+
+        //return data...
         return thirdsAccountsListResponse;
 
         // List<ThirdsAccountsDTO> finalArray = new ArrayList<>();
@@ -508,20 +531,31 @@ public class ThirdsAccountsServiceImp implements ThirdsAccountsService {
         Pageable pageble = PageRequest.of(pageNo, pageSize, sort);
         Page<ThirdsAccounts> thirdsAccountsList = thirdsAccountsRepository.getThirdsAccountsList(customerid, 0,
                 pageble);
-        // System.out.println(thirdsAccountsList.getContent());
 
-        // create a response body...
+        //if we have information...
         ThirdsAccountsListResponse thirdsAccountsListResponse = new ThirdsAccountsListResponse();
-        thirdsAccountsListResponse.setPageNo((pageble.getPageNumber() + 1));
-        thirdsAccountsListResponse.setPageSize(pageble.getPageSize());
-        thirdsAccountsListResponse.setRecordsDisplayed(thirdsAccountsList.getNumberOfElements());
-        thirdsAccountsListResponse.setDateTimeResponse(dateFormat.format(date));
-        thirdsAccountsListResponse.setThirdsAccountsList(thirdsAccountsList.getContent());
+        if (thirdsAccountsList != null) {
+            // create a response body...
+            thirdsAccountsListResponse.setPageNo((pageble.getPageNumber() + 1));
+            thirdsAccountsListResponse.setPageSize(pageble.getPageSize());
+            thirdsAccountsListResponse.setRecordsDisplayed(thirdsAccountsList.getNumberOfElements());
+            thirdsAccountsListResponse.setDateTimeResponse(dateFormat.format(date));
+            thirdsAccountsListResponse.setThirdsAccountsList(thirdsAccountsList.getContent());
+        } else {
+            // return a null value...
+            thirdsAccountsListResponse.setPageNo(pageble.getPageNumber());
+            thirdsAccountsListResponse.setPageSize(pageble.getPageSize());
+            thirdsAccountsListResponse.setRecordsDisplayed(thirdsAccountsList.getNumberOfElements());
+            thirdsAccountsListResponse.setDateTimeResponse(dateFormat.format(date));
+            thirdsAccountsListResponse.setThirdsAccountsList(thirdsAccountsList.getContent());
+        }
 
         // adding final array...
         thirdsAccountsListResponse.setMsg(
                 "La página " + (pageble.getPageNumber() + 1) + " contiene " + thirdsAccountsList.getNumberOfElements()
                         + " cuenta(s) de terceros " + vgSourceSPEI + " asociadas al clienteID " + customerid);
+
+        //return data...
         return thirdsAccountsListResponse;
     }
 
