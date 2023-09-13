@@ -1,6 +1,6 @@
 package com.unagra.ebankingapi.models;
 
-import com.unagra.ebankingapi.entities.ebanking.DetailBankInstitution;
+import com.unagra.ebankingapi.dto.DetailBankInstitutionDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,5 +18,6 @@ public class ThirdsAccountsSPEIResponse {
     private String origin;
     private String dateTimeResponse;
     private String msg;
-    private List<DetailBankInstitution> detailBank = new ArrayList<>();
+    //private List<DetailBankInstitutionDTO> detailBank = new ArrayList<>();
+    private DetailBankInstitutionDTO detailBank;
 }

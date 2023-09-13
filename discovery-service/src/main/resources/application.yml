@@ -4,9 +4,9 @@ server:
 
 #eureka setup...
 eureka:
-  instance:
-    prefer-ip-address: true
-    #hostname: localhost
+  #instance:
+    #prefer-ip-address: true
+    #hostname: localhost #used
   client:
     register-with-eureka: false
     fetch-registry: false

@@ -1,7 +1,5 @@
-package com.unagra.ebankingapi.entities.ebanking;
+package com.unagra.ebankingapi.dto;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DetailBankInstitution {
+public class DetailBankInstitutionDTO {
     private String keymatch;
     private Integer cvespei;
     private String institution;

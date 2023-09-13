@@ -23,7 +23,7 @@ public class BankingInstitutionsController {
 
 	@GetMapping("/individual")
 	@ResponseStatus(HttpStatus.OK)
-	public List<DetailbyBankingInstitutionResponse> getBankingInstitutionInfo(@RequestParam(required = true) String keymatch) {
+	public DetailbyBankingInstitutionResponse getBankingInstitutionInfo(@RequestParam(required = true) String keymatch) {
 		return bankingInstitutionsService.getDetailByBankInstitution(keymatch);
 	}
 

@@ -1,8 +1,7 @@
 package com.unagra.ebankingapi.service;
 
-import com.google.gson.Gson;
+import com.unagra.ebankingapi.dto.DetailBankInstitutionDTO;
 import com.unagra.ebankingapi.dto.ThirdsAccountsDTO;
-import com.unagra.ebankingapi.entities.ebanking.DetailBankInstitution;
 import com.unagra.ebankingapi.entities.ebanking.ThirdsAccounts;
 import com.unagra.ebankingapi.exceptions.ResourceNotFoundException;
 import com.unagra.ebankingapi.models.ThirdsAccountsDeleteRequest;
@@ -14,7 +13,6 @@ import com.unagra.ebankingapi.repository.ebanking.OtpTokenRepository;
 import com.unagra.ebankingapi.repository.ebanking.ThirdsAccountsRepository;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -41,7 +40,6 @@ public class ThirdsAccountsServiceImp implements ThirdsAccountsService {
     private Logger logger = LoggerFactory.getLogger(ThirdsAccountsService.class);
     @Autowired
     private ThirdsAccountsRepository thirdsAccountsRepository;
-
     @Autowired
     private BankingInstitutionsRepository bankingInstitutionsRepository;
 
@@ -394,33 +392,79 @@ public class ThirdsAccountsServiceImp implements ThirdsAccountsService {
         }
 
         //get bank information from current keymatch...
-        List<DetailBankInstitution> detailBank = null;
+        //List<DetailBankInstitutionDTO> detailBank = null;
+        //ResponseEntity<DetailBankInstitutionDTO> responseEntity = null;
+        DetailBankInstitutionDTO detailBankInstitutionDTO;
         try {
-            detailBank = restTemplate.getForObject("http://banking-institutions-api/bankinginstitutions/individual?keymatch=" + vlKeyMatch, ArrayList.class);
-            logger.info("{}", detailBank);
+            String baseUrl = "http://banking-institutions-api/bankinginstitutions/individual?keymatch=" + vlKeyMatch;
+            //String baseUrl = "http://banking-institutions-api/bankinginstitutions/individual?keymatch=" + vlKeyMatch;
+
+            detailBankInstitutionDTO = restTemplate.getForObject(baseUrl,DetailBankInstitutionDTO.class);
+
+
+            /*
+            HttpHeaders requestHeaders = new HttpHeaders();
+            // set up HTTP Basic Authentication Header
+            requestHeaders.add("Accept", MediaType.APPLICATION_JSON_VALUE);
+            //Request entity is created with request headers
+            HttpEntity<Object> requestEntity = new HttpEntity<>(requestHeaders);
+            RestTemplate restTemplate = new RestTemplate();
+            //Rest Call to consume Rest Service
+            responseEntity = restTemplate.exchange(baseUrl, HttpMethod.GET, requestEntity, DetailBankInstitutionDTO.class);
+
+            logger.info(responseEntity.getBody().toString());
+            */
+            logger.info(detailBankInstitutionDTO.toString());
+
+
+            //ResponseEntity<DetailBankInstitutionDTO> responseDetailBankingInstitution = restTemplate.getForEntity("http://localhost:6664/bankinginstitutions/individual?keymatch=" + vlKeyMatch, DetailBankInstitutionDTO.class);
+            //ResponseEntity<DetailBankInstitutionDTO> responseDetailBankingInstitution = restTemplate.getForEntity(baseUrl, DetailBankInstitutionDTO.class);
+
+
+            //ResponseEntity<DetailBankInstitutionDTO> detailBankInstitutionResponseEntity = restTemplate.getForObject("http://banking-institutions-api/bankinginstitutions/individual?keymatch=" + vlKeyMatch, DetailBankInstitutionDTO.class);
+            //detailBank = restTemplate.getForObject(baseUrl, ArrayList.class);
+            //ResponseEntity<DetailBankInstitution> = restTemplate.getForEntity("http://banking-institutions-api/bankinginstitutions/individual?keymatch=" + vlKeyMatch,DetailBankInstitution);
+            //detailBankInstitutionClass = restTemplate.getForObject("http://banking-institutions-api/bankinginstitutions/individual?keymatch=" + vlKeyMatch, DetailBankInstitution.class);
+            //logger.info("{}", detailBank);
         } catch (Exception ex) {
-            throw new ResourceNotFoundException("La clave interbancaria o el número de tarjeta ingresado, no tiene relación con una institución financiera valida, favor de revisar nuevamente la cuenta o tarjeta del beneficiario.");
+            throw new ResourceNotFoundException("La clave interbancaria o el número de tarjeta ingresado, no tiene relación con una institución financiera valida, favor de revisar nuevamente la cuenta o tarjeta del beneficiario. \n" + ex.getMessage());
         }
+
+        //response....
+
 
         //create a temporal dto to get information about current bank...
         ThirdsAccountsSPEIResponse thirdsAccountsSPEIResponse = new ThirdsAccountsSPEIResponse();
-        thirdsAccountsSPEIResponse.setDetailBank(detailBank);
+        //DetailBankInstitutionDTO detailBankInstitutionDTO = detailBankInstitutionDTO.getBody();
+        //thirdsAccountsSPEIResponse.setDetailBank(detailBank);
+        thirdsAccountsSPEIResponse.setDetailBank(detailBankInstitutionDTO);
 
+        /*
         //get each value from arrayList...
         String vlJSON = thirdsAccountsSPEIResponse.getDetailBank().toString().replace("[", "").replace("]", "");
         Gson gsonValue = new Gson();
-        DetailBankInstitution detailBankInstitution = gsonValue.fromJson(vlJSON, DetailBankInstitution.class);
+        DetailBankInstitutionDTO detailBankInstitution = gsonValue.fromJson(vlJSON, DetailBankInstitutionDTO.class);
         Long vlKeySPEI = Long.parseLong(detailBankInstitution.getCvespei().toString());
         String vlInstitution = detailBankInstitution.getInstitution();
-        logger.info("Instition: " + vlInstitution);
-        logger.info("InsitutionID: " + vlKeySPEI);
+        */
+        logger.info("Instition: " + detailBankInstitutionDTO.getInstitution());
+        logger.info("InsitutionID: " + detailBankInstitutionDTO.getCvespei());
 
         // we can't proccess acount by UNAGRA...
+        /*
         if (vlKeySPEI.toString().equalsIgnoreCase(vpuUNAGRAID)) {
             System.out.println("UNAGRA Account invalid.");
             throw new BadRequestException("La cuenta de terceros " + vgSourceSPEI
                     + ", no puede contener la institución destino a UNAGRA, si desea capturar una cuenta de tercero perteneciente a UNAGRA use la opción de transferencias entre cuentas UNAGRA.");
         }
+        */
+
+        if (detailBankInstitutionDTO.getCvespei().toString().equalsIgnoreCase(vpuUNAGRAID)) {
+            System.out.println("UNAGRA Account invalid.");
+            throw new BadRequestException("La cuenta de terceros " + vgSourceSPEI
+                    + ", no puede contener la institución destino a UNAGRA, si desea capturar una cuenta de tercero perteneciente a UNAGRA use la opción de transferencias entre cuentas UNAGRA.");
+        }
+
 
         /*
         // validate if current bankid is available...
@@ -430,8 +474,10 @@ public class ThirdsAccountsServiceImp implements ThirdsAccountsService {
         */
 
         //adding information about current bank...
-        thirdsAccountsDTO.setInstitutionid(vlKeySPEI);
-        thirdsAccountsDTO.setBeneficiarybank(vlInstitution);
+        //thirdsAccountsDTO.setInstitutionid(vlKeySPEI);
+        //thirdsAccountsDTO.setBeneficiarybank(vlInstitution);
+        thirdsAccountsDTO.setInstitutionid(Long.parseLong(detailBankInstitutionDTO.getCvespei().toString()));
+        thirdsAccountsDTO.setBeneficiarybank(detailBankInstitutionDTO.getInstitution());
 
         // before to add this account we need to validate that doesn't exists...
         ThirdsAccounts vlExistsAccount = thirdsAccountsRepository.AccountExists(thirdsAccountsDTO.getCustomerid(),
@@ -539,6 +585,8 @@ public class ThirdsAccountsServiceImp implements ThirdsAccountsService {
             thirdsAccountsListResponse.setPageNo((pageble.getPageNumber() + 1));
             thirdsAccountsListResponse.setPageSize(pageble.getPageSize());
             thirdsAccountsListResponse.setRecordsDisplayed(thirdsAccountsList.getNumberOfElements());
+            thirdsAccountsListResponse.setRecodsTotal(thirdsAccountsList.getTotalElements());
+            thirdsAccountsListResponse.setRecodsPages(thirdsAccountsList.getTotalPages());
             thirdsAccountsListResponse.setDateTimeResponse(dateFormat.format(date));
             thirdsAccountsListResponse.setThirdsAccountsList(thirdsAccountsList.getContent());
         } else {
@@ -546,6 +594,8 @@ public class ThirdsAccountsServiceImp implements ThirdsAccountsService {
             thirdsAccountsListResponse.setPageNo(pageble.getPageNumber());
             thirdsAccountsListResponse.setPageSize(pageble.getPageSize());
             thirdsAccountsListResponse.setRecordsDisplayed(thirdsAccountsList.getNumberOfElements());
+            thirdsAccountsListResponse.setRecodsTotal(thirdsAccountsList.getTotalElements());
+            thirdsAccountsListResponse.setRecodsPages(thirdsAccountsList.getTotalPages());
             thirdsAccountsListResponse.setDateTimeResponse(dateFormat.format(date));
             thirdsAccountsListResponse.setThirdsAccountsList(thirdsAccountsList.getContent());
         }

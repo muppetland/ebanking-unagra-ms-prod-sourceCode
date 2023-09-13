@@ -9,8 +9,8 @@ spring:
 
   #setup git eureka config from application.yml...
   config:
-    #import: optional:configserver:http://localhost:6661
-    import: ${SPRING_CONFIG_SERVER:optional:configserver:http://localhost:6661}
+    import: optional:configserver:http://localhost:6661
+    #import: ${SPRING_CONFIG_SERVER:optional:configserver:http://localhost:6661}
 
     #hibernet properties...
     #.ddl-auto = In production, it's often highly recommended you use "NONE", don't remove it please or you will be fire and us we're gonna hit by ceo....
@@ -66,15 +66,16 @@ logging:
 eureka:
   instance:
     prefer-ip-address: true
-    hostname: localhost
+    #hostname: localhost
   client:
     enabled: true
     healthcheck:
       enabled: true
     registry-with-eureka: true
+    fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
-      #defaultZone: http://localhost:8761/eureka
+      #defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+      defaultZone: http://localhost:8761/eureka
 
 #about the app...
 info:

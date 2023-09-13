@@ -9,5 +9,5 @@ import java.util.List;
 public interface BankingInstitutionsCatalogueService {
 	public BankingInstitutionsCatalogueResponse getBankingInstitutiosAvailableArray();
 
-	public List<DetailbyBankingInstitutionResponse> getDetailByBankInstitution (String keymatch);
+	public DetailbyBankingInstitutionResponse getDetailByBankInstitution (String keymatch);
 }

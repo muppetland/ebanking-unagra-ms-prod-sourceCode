@@ -17,13 +17,13 @@ spring:
 
 #setup eureka client
 eureka:
-  instance:
-    prefer-ip-address: true
-    hostname: localhost
+  #instance:
+    #prefer-ip-address: true
+    #hostname: localhost
   client:
     fetch-registry: true
     registry-with-eureka: true
     service-url:
-      #defaultZone: http://localhost:8761/eureka
-      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+      defaultZone: http://localhost:8761/eureka
+      #defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
 

@@ -51,14 +51,14 @@ public class BankingInstitutionsCatalogueServiceImp implements BankingInstitutio
     }
 
     @Override
-    public List<DetailbyBankingInstitutionResponse> getDetailByBankInstitution(String keymatch) {
+    public DetailbyBankingInstitutionResponse getDetailByBankInstitution(String keymatch) {
         //find key value sent...
         DetailBankInstitution detailBankInstitution = detailBankInstitutionRepository
                 .findById(keymatch)
                 .orElseThrow(() -> new ResourceNotFoundException(keymatch));
 
         //parse this current value to response...
-        List<DetailbyBankingInstitutionResponse> finalList = new ArrayList<>();
+        //List<DetailbyBankingInstitutionResponse> finalList = new ArrayList<>();
         DetailbyBankingInstitutionResponse detailbyBankingInstitutionResponse = new DetailbyBankingInstitutionResponse()
                 .builder()
                 .institution(detailBankInstitution.getInstitution().trim())
@@ -66,8 +66,8 @@ public class BankingInstitutionsCatalogueServiceImp implements BankingInstitutio
                 .iscard(detailBankInstitution.getIscard())
                 .keymatch(detailBankInstitution.getKeymatch().trim())
                 .build();
-        finalList.add(detailbyBankingInstitutionResponse);
-        return finalList;
+        //finalList.add(detailbyBankingInstitutionResponse);
+        return detailbyBankingInstitutionResponse;
     }
 
     // convert Entity to DTO...

@@ -9,8 +9,8 @@ spring:
 
   #setup git eureka config from application.yml...
   config:
-    #import: optional:configserver:http://localhost:6661
-    import: ${SPRING_CONFIG_SERVER:optional:configserver:http://localhost:6661}
+    import: optional:configserver:http://localhost:6661
+    #import: ${SPRING_CONFIG_SERVER:optional:configserver:http://localhost:6661}
 
 
   #just we need to use only db in this api...
@@ -60,15 +60,17 @@ ebanking:
 
 #setup eureka client
 eureka:
-  instance:
-    prefer-ip-address: true
-    hostname: localhost
+  #instance:
+    #prefer-ip-address: true
+    #hostname: localhost
   client:
     healthcheck:
       enabled: true
     registry-with-eureka: true
+    fetch-registry: true
     service-url:
-      defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+      #defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+      defaultZone: http://localhost:8761/eureka
 
 #about the app...
 info:
