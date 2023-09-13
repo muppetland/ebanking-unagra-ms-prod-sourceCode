@@ -1,6 +1,6 @@
 #port application
 server:
-  port: 6665
+  port: 6666
   #${random.int(7000,7100)}
 
 #application name

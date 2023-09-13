@@ -1,52 +1,55 @@
 #port application
 server:
-  port: 6665
+  port: 6664
 
 #application name
 spring:
   application:
-    name: banking-institutions-api
+    name: hsm-api
 
   #setup git eureka config from application.yml...
   config:
     import: optional:configserver:http://localhost:6661
     #import: ${SPRING_CONFIG_SERVER:optional:configserver:http://localhost:6661}
 
-
-  #just we need to use only db in this api...
-  datasource:
-    url: ENC(ylXv9DBRAJspDdfU7VhxJ0YjuBtCUwbr8jt0X/kE/q+mjTA7Uxu3qwwjKycUStIXxC+4fs3f7SsZbB5WwpdTSBxEQAwnuMjA/uL8cNOvY8l0jG0tQhxgFpXE5GxAL2Wf5Yz28+cE4fi6eSfVojgWb+/IpwjO7m0z8rkECbPQrwJm9yvR4G9HR/0EggTupapN)
-    username: ENC(mAxFuI16bBzqozVT5vtHz1+qCyWtjJJQLqgt09qmYk2Fe0uCAG8l5rCaWLfBavMu)
-    password: ENC(IDH9Ccf08NoLoP9b7hLxXIkZgYA6s6yG7/5X/jCVVLOrctJ2bF47YZh52SBDWURx2WwikVgrD1Z4TpzBjM5Lig==)
-    driver.class: com.microsoft.sqlserver.jdbc.SQLServerDriver
-
     #hibernet properties...
     #.ddl-auto = In production, it's often highly recommended you use "NONE", don't remove it please or you will be fire and us we're gonna hit by ceo....
     #.ddl-auto = In development, it's often common to see developers "UPDATE"...
   jpa:
     hibernate:
-      dll-auto: none
-      show-sql: false
+      dll-auto: update
+      show-sql: true
       default_schema: dbo
       repositories:
         bootstrap-mode: default
       properties:
         hibernate:
           format_sql: true
+          show-sql: true
           dialect: org.hibernate.dialect.SQLServer2016Dialect
     properties:
       hibernate:
         type:
           preferred_instant_jdbc_type: TIMESTAMP #is used for version spring boot 3 and jpa 6
 
-  #set jasypt properties to encrypt...
+
+  #just we need to use only db in this api...
+  datasource:
+    url: ENC(ylXv9DBRAJspDdfU7VhxJ0YjuBtCUwbr8jt0X/kE/q+mjTA7Uxu3qwwjKycUStIXxC+4fs3f7SsZbB5WwpdTSBxEQAwnuMjA/uL8cNOvY8l0jG0tQhxgFpXE5GxAL2Wf5Yz28+cE4fi6eSfVojgWb+/IpwjO7m0z8rkECbPQrwJm9yvR4G9HR/0EggTupapN)
+    #ENC(kKh6fNVAHpIW2ZztaanNQ/3fEYoZsiVkaJfD2GfKvH5WWE1eEuYBQRslemkA5wliTBitl6xbaY6/A6e9+3iWuchJ20QT5uvYPjLIlmo3z95fE7h7zM2ZQ4pdoTbLIeo1)
+    username: ENC(mAxFuI16bBzqozVT5vtHz1+qCyWtjJJQLqgt09qmYk2Fe0uCAG8l5rCaWLfBavMu)
+    password: ENC(IDH9Ccf08NoLoP9b7hLxXIkZgYA6s6yG7/5X/jCVVLOrctJ2bF47YZh52SBDWURx2WwikVgrD1Z4TpzBjM5Lig==)
+    driver.class: com.microsoft.sqlserver.jdbc.SQLServerDriver
+
+
+#set jasypt properties to encrypt...
 jasypt:
   encryptor.algorithm: PBEWITHHMACSHA512ANDAES_256
   encryptor.iv-generator-classname: org.jasypt.iv.RandomIvGenerator
   encryptor.password: "*1JFoA1OhNT*NN6O"
 
-  #vector to use for Encrypt/Decrypt values in our project...
-ebanking:
+#vector to use for Encrypt/Decrypt values in our project...
+hsm:
   vector: ENC(cJ2RmBMuiOoUsmff91n8fs4Lzyzj9V33hYTatwcD1RAzEf/rdirNTHRZEEhauNUUsHKjl3hwVpDwCIwJsxeZuw==)
   password: ENC(HawLMaGNCzRtSwNFkS7mmZi16Vv68uyC0CVBWyO6mEGUMUuhGpglN24DhPFPGdIlvS3YaTGGyTO5wH87JThxXA==)
   enviormentClass: ENC(Mfx9dIe8KQ1///M1Rljrj/1wPT+QsfVxKlUAX7yaTbzlR239tIYt5SWTig3JuuHK)
@@ -56,14 +59,27 @@ ebanking:
   lapsedMinutsBetweenTransfer: 1
   pageNo: "0"
   pageSize: "20"
+  filterOption: 1
+  startDate: ""
+  endDate: ""
 
+#hibernate tracking...
+logging:
+  level:
+    org:
+      hibernate:
+        INFO:
+          SQL: DEBUG
+          cache: DEBUG
+          stat: DEBUG
 
 #setup eureka client
 eureka:
-  #instance:
-    #prefer-ip-address: true
+  instance:
+    prefer-ip-address: true
     #hostname: localhost
   client:
+    enabled: true
     healthcheck:
       enabled: true
     registry-with-eureka: true
@@ -77,7 +93,7 @@ info:
   app:
     name: ${spring.application.name}
 
-#config circuit breaker...
+#config...
 management:
   endpoints:
     web:
