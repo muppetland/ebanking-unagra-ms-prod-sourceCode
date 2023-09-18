@@ -1,0 +1,91 @@
+  #adding jackson
+  jackson:
+    deserialization:
+      FAIL_ON_IGNORED_PROPERTIES: false
+    serialization:
+      INDENT_OUTPUT: false
+      WRITE_DATES_AS_TIMESTAMPS: false
+      #WRITE_BIGDECIMAL_AS_PLAIN: true
+
+  #setup api gateway path...
+    discovery:
+      enabled: true
+    gateway:
+      metrics:
+        enabled: true
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: ebanking-api-id
+          uri: lb://ebanking-api
+          predicates:
+            - Path=/api/**
+            #- Method=GET,POST,DELETE,PUT,OPTIONS
+          filters:
+            - AuthFilter
+            #- StripPrefix=1
+
+        - id: banking-institutions-api-id
+          uri: lb://banking-institutions-api
+          predicates:
+            - Path=/bankinginstitutions/**
+            #- Method=GET,POST,DELETE,PUT,OPTIONS
+          #filters:
+            #- AuthFilter
+            #- StripPrefix=1
+
+        - id: auth-api-id
+          uri: lb://auth-api
+          predicates:
+            - Path=/auth/**
+            #- Method=GET,POST,DELETE,PUT,OPTIONS
+            #filters:
+            #- StripPrefix=1
+
+        - id: hsm-api-id
+          uri: lb://hsm-api
+          predicates:
+            - Path=/hsm/**
+
+
+#setup port...
+server:
+  port: 6662
+  
+#registry to eureka server...
+eureka:
+  instance:
+    prefer-ip-address: true
+    #hostname: localhost
+  client:
+    enabled: true
+    healthcheck:
+      enabled: true
+    registry-with-eureka: true
+    fetch-registry: true
+    service-url:
+      #defaultZone: ${EUREKA_SERVER:http://localhost:8761/eureka}
+      defaultZone: http://localhost:8761/eureka
+
+#about the app...
+info:
+  app:
+    name: ${spring.application.name}
+
+#config actuator...
+management:
+  endpoint:
+    gateway:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include:
+          - mappings
+          - env
+          - health
+          - info
+          - gateway
+
